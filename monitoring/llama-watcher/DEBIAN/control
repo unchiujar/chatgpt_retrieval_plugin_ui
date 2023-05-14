@@ -1,0 +1,8 @@
+Package: llama-watcher
+Version: 0.0.14
+Section: utils
+Priority: optional
+Architecture: all
+Depends: python3, inotify-tools
+Maintainer: Your Name vasile.jureschi@gmail.com
+Description: A utility to watch directories and files and add changed files to a llama_index database

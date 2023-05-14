@@ -1,0 +1,21 @@
+#!/bin/bash
+
+# Define the file that will hold the list of directories to watch
+DIR_LIST=~/.llama_index/watched
+
+# Log file to store the logs
+LOG_FILE=~/.llama_index/watcher.log
+
+# Check if a directory was passed as an argument
+if [ -z "$1" ]; then
+    echo "Usage: $0 <directory>"
+    exit 1
+fi
+
+# Convert the directory to an absolute path
+ABS_PATH=$(realpath "$1")
+
+# Remove the directory from the file, if it exists
+sed -i "\|$ABS_PATH|d" "${DIR_LIST}"
+
+echo "$(date): ${ABS_PATH} removed from watchlist." >> "${LOG_FILE}"

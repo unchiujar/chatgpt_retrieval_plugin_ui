@@ -1,3 +1,5 @@
 secrets.py
 data/
 __pycache__/
+llama_watcher.deb
+.idea/

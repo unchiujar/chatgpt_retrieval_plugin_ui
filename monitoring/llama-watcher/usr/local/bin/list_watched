@@ -1,0 +1,8 @@
+#!/bin/bash
+
+# Define the file that will hold the list of directories to watch
+DIR_LIST=~/.llama_index/watched
+# Check if the parent directory exists and create it if it doesn't
+mkdir -p $(dirname "${DIR_LIST}")
+
+cat "${DIR_LIST}"

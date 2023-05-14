@@ -1,0 +1,20 @@
+#!/bin/sh
+
+echo "This package requires additional Python libraries that must be installed manually."
+echo "Please run the following command after this installation completes:"
+echo "pip3 install requests pydantic"
+
+
+# script path and lock file
+MONITOR_SCRIPT_PATH="/usr/local/bin/index_and_watch"
+LOCK_FILE="~/.llama_index/.monitor_lock"
+
+# bashrc line to be added
+BASHRC_LINE="
+if [ ! -e \"${LOCK_FILE}\" ]; then
+    nohup \"${MONITOR_SCRIPT_PATH}\" >/dev/null 2>&1 &
+fi
+"
+
+echo "To start the llama indexing automatically automatically, add the following lines to your .bashrc file:"
+echo "${BASHRC_LINE}"

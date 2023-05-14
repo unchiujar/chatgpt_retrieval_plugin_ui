@@ -1,0 +1,44 @@
+#!/bin/bash
+
+# Define the file that will hold the list of directories to watch
+DIR_LIST=~/.llama_index/watched
+# Check if the parent directory exists and create it if it doesn't
+mkdir -p $(dirname "${DIR_LIST}")
+
+# The script to run when files change
+ACTION_SCRIPT=/usr/local/bin/llama_index_utils.py
+
+# Lock file to prevent multiple instances
+LOCK_FILE=~/.llama_index/.watcher_lock
+
+# Log file to store the logs
+LOG_FILE=~/.llama_index/watcher.log
+
+# If the lock file exists, exit (another instance is running)
+if [ -e "${LOCK_FILE}" ]; then
+    echo "$(date): Lock exists, another notifier is running, exiting." >> "${LOG_FILE}"
+    exit 0
+fi
+
+touch "${LOCK_FILE}"
+echo "$(date): Created lock file ${LOCK_FILE} " >> "${LOG_FILE}"
+
+# Set a trap to delete the lock file on exit
+trap 'rm -f "${LOCK_FILE}"; exit' INT TERM EXIT
+
+echo "$(date): Starting watcher loop " >> "${LOG_FILE}"
+while true; do
+    while read -r MONITORED_DIR
+    do
+        inotifywait -r -e modify,create,delete --format '%w%f' "${MONITORED_DIR}" | while read FILE
+        do
+            # Log the event to the log file
+            echo "$(date): ${MONITORED_DIR} was modified." >> "${LOG_FILE}"
+            python3 "${ACTION_SCRIPT}" "${MONITORED_DIR}" Unknown 2>> "${LOG_FILE}"
+        done &
+    done < "${DIR_LIST}"
+
+    # Wait for the list of directories to change
+    inotifywait "${DIR_LIST}"
+done
+echo "$(date): Stopped watcher loop " >> "${LOG_FILE}"
